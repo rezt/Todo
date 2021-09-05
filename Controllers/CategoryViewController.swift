@@ -12,6 +12,7 @@ class CategoryViewController: UITableViewController {
     
     var categoryArray = [ItemCategory]()
     
+    
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
 
@@ -19,7 +20,6 @@ class CategoryViewController: UITableViewController {
         super.viewDidLoad()
         
         loadData()
-
     }
     
     //MARK: - TableView Datasource Methods
@@ -33,6 +33,23 @@ class CategoryViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
         cell.textLabel?.text = category.name
         return cell
+    }
+    
+    //MARK: - TableView Delegate Methods
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        print(tableView.cellForRow(at: indexPath)?.textLabel?.text ?? "no data")
+        
+        
+        performSegue(withIdentifier: "goToItems", sender: self)
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let destinationVC = segue.destination as! TodoListViewController
+        if let indexPath = tableView.indexPathForSelectedRow {
+            destinationVC.selectedCategory = categoryArray[indexPath.row]
+        }
     }
     
     
@@ -96,8 +113,6 @@ class CategoryViewController: UITableViewController {
     
     
     
-    //MARK: - TableView Delegate Methods
-    
-    
+
     
 }

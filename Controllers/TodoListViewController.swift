@@ -14,6 +14,12 @@ class TodoListViewController: UITableViewController {
     
     var itemArray = [Item]()
     
+    var selectedCategory: ItemCategory? {
+        didSet {
+            loadData()
+        }
+    }
+    
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
@@ -22,9 +28,10 @@ class TodoListViewController: UITableViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
+        self.title = selectedCategory?.name
+        
         searchBar.delegate = self
         
-        loadData()
     }
     
     //MARK: - TableView Datasource Methods
@@ -81,6 +88,7 @@ class TodoListViewController: UITableViewController {
                 let newTask = Item(context: self.context)
                 newTask.title = item
                 newTask.done = false
+                newTask.parentCategory = self.selectedCategory
                 self.itemArray.append(newTask)
                 
                 self.saveData()
