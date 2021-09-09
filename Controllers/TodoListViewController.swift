@@ -4,6 +4,8 @@
 //
 //  Created by Piotr Ćwiertnia on 02/09/2021.
 //
+// TODO: Create this app in SwiftUI
+
 
 import UIKit
 import CoreData
