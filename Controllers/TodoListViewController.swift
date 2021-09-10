@@ -5,7 +5,7 @@
 //  Created by Piotr Ćwiertnia on 02/09/2021.
 //
 // TODO: Create this app in SwiftUI
-
+// I'm too sick to work ;/
 
 import UIKit
 import CoreData
