@@ -6,11 +6,11 @@
 //
 
 import UIKit
-import CoreData
+import RealmSwift
 
 class CategoryViewController: UITableViewController {
     
-    
+    let realm = try! Realm()
     
     var categoryArray = [Category]()
     
@@ -21,7 +21,7 @@ class CategoryViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        loadData()
+//        loadData()
     }
     
     //MARK: - TableView Datasource Methods
@@ -69,11 +69,11 @@ class CategoryViewController: UITableViewController {
                 }
                 print(item)
                 
-                let newCategory = ItemCategory(context: self.context)
+                let newCategory = Category()
                 newCategory.name = item
                 self.categoryArray.append(newCategory)
                 
-                self.saveData()
+                self.save(category: newCategory)
                 
                 self.tableView.reloadData()
             }
@@ -94,26 +94,28 @@ class CategoryViewController: UITableViewController {
     
     //MARK: - Data Manipulation Methods
     
-    func saveData() {
+    func save(category: Category) {
         do{
-            try context.save()
+            try realm.write {
+                realm.add(category)
+            }
         } catch {
             print(error.localizedDescription)
         }
     }
     
-    func loadData(with request: NSFetchRequest<ItemCategory> = ItemCategory.fetchRequest()) {
-        
-        do {
-            categoryArray = try context.fetch(request)
-        } catch {
-            print(error.localizedDescription)
-        }
-        
-        tableView.reloadData()
-    }
-    
-    
+//    func loadData(with request: NSFetchRequest<ItemCategory> = ItemCategory.fetchRequest()) {
+//
+//        do {
+//            categoryArray = try context.fetch(request)
+//        } catch {
+//            print(error.localizedDescription)
+//        }
+//
+//        tableView.reloadData()
+//    }
+//
+//
     
 
     
