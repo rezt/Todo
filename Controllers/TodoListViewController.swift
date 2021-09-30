@@ -5,7 +5,6 @@
 //  Created by Piotr Ćwiertnia on 02/09/2021.
 //
 // TODO: Create this app in SwiftUI
-// I'm too sick to work ;/
 
 import UIKit
 import RealmSwift
@@ -13,6 +12,7 @@ import RealmSwift
 class TodoListViewController: UITableViewController {
     
     @IBOutlet weak var searchBar: UISearchBar!
+    
     
     var todoItems: Results<Item>?
     let realm = try! Realm()
@@ -33,7 +33,7 @@ class TodoListViewController: UITableViewController {
         
         self.title = selectedCategory?.name
         
-//        searchBar.delegate = self
+        searchBar.delegate = self
         
     }
     
@@ -106,6 +106,7 @@ class TodoListViewController: UITableViewController {
                         try self.realm.write {
                             let newTask = Item()
                             newTask.title = item
+                            newTask.dateCreated = Date()
                             currentCategory.items.append(newTask)
                         }
                     } catch {
@@ -170,35 +171,37 @@ class TodoListViewController: UITableViewController {
     
 }
 
-//extension TodoListViewController: UISearchBarDelegate {
-//
-////    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-////        let request: NSFetchRequest<Item> = Item.fetchRequest()
-////
-////        request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
-////
-////        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
-////
-////        loadData(with: request)
-////    }
-//
-//    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-//        if searchBar.text?.count == 0 {
-//            loadData()
-//
-//            DispatchQueue.main.async {
-//                searchBar.resignFirstResponder()
-//            }
-//        } else {
+extension TodoListViewController: UISearchBarDelegate {
+
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        
+        todoItems = todoItems?.filter("title CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "dateCreated", ascending: true)
+        
+        tableView.reloadData()
+        
+//        let request: NSFetchRequest<Item> = Item.fetchRequest()
+//        request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+//        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+//        loadData(with: request)
+    }
+
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        
+        if searchBar.text?.count == 0 {
+            loadData()
+
+            DispatchQueue.main.async {
+                searchBar.resignFirstResponder()
+            }
+        }
+//        else {
 //            let request: NSFetchRequest<Item> = Item.fetchRequest()
-//
 //            request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
-//
 //            request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
-//
-//            loadData(with: request)
+
+//            loadData()
 //        }
-//    }
-//
-//}
+    }
+
+}
 
