@@ -8,17 +8,18 @@
 // I'm too sick to work ;/
 
 import UIKit
-import CoreData
+import RealmSwift
 
 class TodoListViewController: UITableViewController {
     
     @IBOutlet weak var searchBar: UISearchBar!
     
-    var itemArray = [Item]()
+    var todoItems: Results<Item>?
+    let realm = try! Realm()
     
     var selectedCategory: Category? {
         didSet {
-//            loadData()
+            loadData()
         }
     }
     
@@ -39,15 +40,18 @@ class TodoListViewController: UITableViewController {
     //MARK: - TableView Datasource Methods
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return itemArray.count
+        return todoItems?.count ?? 1
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let item = itemArray[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath)
-        cell.textLabel?.text = item.title
         
-        cell.accessoryType = item.done ? .checkmark : .none
+        if let item = todoItems?[indexPath.row] {
+            cell.textLabel?.text = item.title
+            cell.accessoryType = item.done ? .checkmark : .none
+        } else {
+            cell.textLabel?.text = "No Items Added"
+        }
         
         return cell
     }
@@ -63,9 +67,9 @@ class TodoListViewController: UITableViewController {
 //        itemArray.remove(at: indexPath.row)
         
         
-        itemArray[indexPath.row].done = !itemArray[indexPath.row].done
-        
-        saveData()
+//        todoItems[indexPath.row].done = !todoItems[indexPath.row].done
+//
+//        saveData()
         
         tableView.reloadData()
         
@@ -87,13 +91,25 @@ class TodoListViewController: UITableViewController {
                 }
                 print(item)
                 
+                if let currentCategory = self.selectedCategory {
+                    do {
+                        try self.realm.write {
+                            let newTask = Item()
+                            newTask.title = item
+                            currentCategory.items.append(newTask)
+                        }
+                    } catch {
+                        print(error.localizedDescription)
+                    }
+                }
+                
 //                let newTask = Item(context: self.context)
 //                newTask.title = item
 //                newTask.done = false
 //                newTask.parentCategory = self.selectedCategory
 //                self.itemArray.append(newTask)
                 
-                self.saveData()
+//                self.saveData()
                 
                 self.tableView.reloadData()
             }
@@ -111,17 +127,19 @@ class TodoListViewController: UITableViewController {
     
     //MARK: - Model Manipulation Method
     
-    func saveData() {
-        
-        do{
-            try context.save()
-        } catch {
-            print(error.localizedDescription)
-        }
-    }
-    
-//    func loadData(with request: NSFetchRequest<Item> = Item.fetchRequest()) {
+//    func saveData() {
 //
+//        do{
+//            try context.save()
+//        } catch {
+//            print(error.localizedDescription)
+//        }
+//    }
+    
+    func loadData() {
+        
+        todoItems = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true)
+
 //        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
 //        if let safePredicate = request.predicate {
 //            request.predicate = NSCompoundPredicate(type: .and, subpredicates: [safePredicate, categoryPredicate])
@@ -134,9 +152,9 @@ class TodoListViewController: UITableViewController {
 //        } catch {
 //            print(error.localizedDescription)
 //        }
-//
-//        tableView.reloadData()
-//    }
+
+        tableView.reloadData()
+    }
     
     
     
