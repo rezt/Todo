@@ -62,6 +62,16 @@ class TodoListViewController: UITableViewController {
         
         print(tableView.cellForRow(at: indexPath)?.textLabel?.text ?? "no data")
         
+        if let item = todoItems?[indexPath.row] {
+            do {
+                try realm.write {
+                    item.done = !item.done
+                }
+            } catch {
+                print(error.localizedDescription)
+            }
+        }
+        
 //        ~~~ Delete functionality ~~~
 //        context.delete(itemArray[indexPath.row])
 //        itemArray.remove(at: indexPath.row)
